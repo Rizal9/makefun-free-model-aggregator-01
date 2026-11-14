@@ -51,6 +51,13 @@
 // register body's catalog must be that same document. Build it once, as this file does, and use
 // the one object.
 
+// ROUTING STRATEGY (summary)
+//   Rank free models by rating, best first. Spread load under each provider's planned
+//   per-trial capacity (calls_min) so the strongest provider is not burned out early.
+//   On 402/429/5xx, fail over to the next candidate in the ranking — never forward the
+//   error. Never route JSON-mode OpenAI requests to anthropic-wire providers (they cannot
+//   echo json_mode); only openai- and gemini-wire providers can carry it.
+
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import {
   authHeaders,
